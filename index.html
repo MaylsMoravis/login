@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asosiy sahifa</title>
+</head>
+<body>
+    <h2>Assalomu alaykum, <span id="userName"></span>!</h2>
+    <p id="infoMessage" style="color: red;"></p>
+    <button id="logout">Chiqish</button>
+
+    <script>
+        let loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+        let users = JSON.parse(localStorage.getItem("users"));
+
+        if (loggedInUser) {
+            document.getElementById("userName").textContent = loggedInUser.name;
+            let originalUser = users.find(user => user.id === loggedInUser.id);
+
+            if (originalUser && loggedInUser.password !== originalUser.password) {
+                document.getElementById("infoMessage").textContent = "Parolni va ID ni o‘zingiz qo‘ysangiz bo‘ladi!";
+            }
+        } else {
+            window.location.href = "kirish.html";
+        }
+
+        document.getElementById("logout").addEventListener("click", function() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "./Login/Login.html";
+        });
+    </script>
+</body>
+</html>

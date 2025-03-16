@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <h2>Kirish</h2>
+    <form id="loginForm">
+        <div><i class="fa-solid fa-user-tie"></i></div>
+        <i class="fa-solid fa-id-badge"></i>
+        <input type="text" id="userId" placeholder="Foydalanuvchi ID" required>
+
+        <div class="password-container">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="Parolni kiriting" required>
+            <i class="fa fa-eye eye-icon" id="eye-icon"></i>
+        </div>
+
+        <button type="submit">Kirish</button>
+    </form>
+    <p id="message" style="color: red;"></p>
+
+    <script>
+        async function loadUsers() {
+            let response = await fetch("users.json");
+            let users = await response.json();
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        if (!localStorage.getItem("users")) {
+            loadUsers();
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let userId = document.getElementById("userId").value.trim();
+            let password = document.getElementById("password").value.trim();
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            let foundUser = users.find(user => user.id === userId);
+
+            if (foundUser) {
+                if (foundUser.password === password) {
+                    localStorage.setItem("loggedInUser", JSON.stringify(foundUser));
+                    window.location.href = "../index.html";
+                } else {
+                    let newPass = prompt("Parol noto‘g‘ri! Yangi parolni kiriting:");
+                    if (newPass) {
+                        let confirmPass = prompt("Yangi parolni qayta kiriting:");
+                        if (newPass === confirmPass) {
+                            foundUser.password = newPass;
+                            localStorage.setItem("users", JSON.stringify(users));
+                            document.getElementById("message").textContent = "Parol yangilandi. Yangi parol bilan kiring!";
+                        } else {
+                            document.getElementById("message").textContent = "Parollar mos kelmadi!";
+                        }
+                    }
+                }
+            } else {
+                document.getElementById("message").textContent = "Bunday foydalanuvchi topilmadi!";
+            }
+        });
+        const passwordInput = document.getElementById("password");
+        const eyeIcon = document.getElementById("eye-icon");
+
+        eyeIcon.addEventListener("click", () => {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>
